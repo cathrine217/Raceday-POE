@@ -2,34 +2,48 @@ name: Validate Docs Folder
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check required files exist in /docs
+      - name: Check docs folder
         run: |
           echo "Checking docs folder..."
+
           if [ ! -d "docs" ]; then
-            echo "docs folder missing!"
+            echo "ERROR: docs folder is missing"
             exit 1
           fi
+
           echo "docs folder exists"
 
-          if [ ! -f "docs/erd.png" ] && [ ! -f "docs/erd.pdf" ]; then
-            echo "ERD file missing (must be PNG or PDF)"
+      - name: Check ERD file
+        run: |
+          if [ -f "docs/erd.png" ] || [ -f "docs/erd.pdf" ]; then
+            echo "ERD file found"
+          else
+            echo "ERROR: ERD file is missing"
+            echo "Expected docs/erd.png or docs/erd.pdf"
             exit 1
           fi
-          echo "ERD file found"
 
-          if [ ! -f "docs/endpoint-plan.md" ] && [ ! -f "docs/endpoint-plan.pdf" ]; then
-            echo "Endpoint plan missing (must be MD or PDF)"
+      - name: Check endpoint plan
+        run: |
+          if [ -f "docs/endpoint-plan.md" ] || [ -f "docs/endpoint-plan.pdf" ]; then
+            echo "Endpoint plan found"
+          else
+            echo "ERROR: Endpoint plan is missing"
+            echo "Expected docs/endpoint-plan.md or docs/endpoint-plan.pdf"
             exit 1
           fi
-          echo "Endpoint plan found"
